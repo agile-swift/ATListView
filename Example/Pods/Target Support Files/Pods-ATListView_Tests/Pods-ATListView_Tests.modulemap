@@ -1,0 +1,6 @@
+framework module Pods_ATListView_Tests {
+  umbrella header "Pods-ATListView_Tests-umbrella.h"
+
+  export *
+  module * { export * }
+}

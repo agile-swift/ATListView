@@ -1,0 +1,27 @@
+{
+  "name": "ATListView",
+  "version": "0.1.0",
+  "summary": "A short description of ATListView.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/devkevinma@gmail.com/ATListView",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "devkevinma@gmail.com": "admin@makaiwen.com"
+  },
+  "source": {
+    "git": "https://github.com/devkevinma@gmail.com/ATListView.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "9.0"
+  },
+  "dependencies": {
+    "ATRefresh": [
+
+    ]
+  },
+  "source_files": "ATListView/Classes/**/*"
+}

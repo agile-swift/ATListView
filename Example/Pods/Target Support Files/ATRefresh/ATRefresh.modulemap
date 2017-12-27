@@ -1,0 +1,6 @@
+framework module ATRefresh {
+  umbrella header "ATRefresh-umbrella.h"
+
+  export *
+  module * { export * }
+}

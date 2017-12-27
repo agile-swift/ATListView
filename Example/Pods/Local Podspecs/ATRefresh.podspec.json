@@ -1,0 +1,22 @@
+{
+  "name": "ATRefresh",
+  "version": "0.1.0",
+  "summary": "A short description of ATRefresh.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/devkevinma@gmail.com/ATRefresh",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "devkevinma@gmail.com": "admin@makaiwen.com"
+  },
+  "source": {
+    "git": "https://github.com/devkevinma@gmail.com/ATRefresh.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "8.0"
+  },
+  "source_files": "ATRefresh/Classes/**/*"
+}
