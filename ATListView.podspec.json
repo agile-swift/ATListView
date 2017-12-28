@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "summary": "A short description of ATListView.",
   "description": "TODO: Add long description of the pod here.",
-  "homepage": "https://github.com/devkevinma@gmail.com/ATListView",
+  "homepage": "https://github.com/agile-swift/ATListView",
   "license": {
     "type": "MIT",
     "file": "LICENSE"
@@ -12,7 +12,7 @@
     "devkevinma@gmail.com": "admin@makaiwen.com"
   },
   "source": {
-    "git": "https://github.com/devkevinma@gmail.com/ATListView.git",
+    "git": "https://github.com/agile-swift/ATListView.git",
     "tag": "0.1.0"
   },
   "platforms": {
