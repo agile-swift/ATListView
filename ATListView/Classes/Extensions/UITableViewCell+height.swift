@@ -11,6 +11,7 @@ private var BottomViewSpaceKey : Void?
 
 private var BottomViewKey : Void?
 
+// MARK: - cell 计算高度扩展
 public extension UITableViewCell {
     
     fileprivate enum ViewTag : Int {
@@ -18,6 +19,7 @@ public extension UITableViewCell {
         case unignore = 1317748
     }
     
+    /// contentView最底部视图距cell底部的距离
     public var autoBottomViewSpace : CGFloat? {
         get {
             return objc_getAssociatedObject(self, &BottomViewSpaceKey) as? CGFloat
@@ -31,6 +33,7 @@ public extension UITableViewCell {
         }
     }
     
+    /// 自动计算高度时指定的最底部视图，设置该值可免去系统获取最底部视图的步骤
     public var autoBottomView : UIView? {
         get {
             return objc_getAssociatedObject(self, &BottomViewKey) as? UIView
@@ -58,11 +61,15 @@ public extension UITableViewCell {
     }
 }
 
+// MARK: - cell高度相关UIView扩展
 public extension UIView {
+    
+    /// 在自动计算高度时永久忽略该UIView
     public func ignoreAlwaysInCell() {
         self.tag = UITableViewCell.ViewTag.ignore.rawValue
     }
     
+    /// 在自动计算高度时永久计算该UIView
     public func unignoreAlwaysInCell() {
         self.tag = UITableViewCell.ViewTag.unignore.rawValue
     }

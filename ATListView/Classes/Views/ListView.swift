@@ -8,6 +8,7 @@
 import UIKit
 import ATRefresh
 
+/// ListView 中单一section的占位类型
 public struct EmptySection : CustomStringConvertible {
     private init() {}
     static var value : EmptySection {
@@ -19,10 +20,14 @@ public struct EmptySection : CustomStringConvertible {
     }
 }
 
+/// 单一section的列表视图
 open class ListView<RowType> : SectionListView<EmptySection,RowType> {
 
     public typealias ListViewLoadDatasClosure = ([RowType]?, Bool, @escaping (NSError?, [RowType]?, Bool) -> ()) -> ()
 
+    /// 配置加载数据的方法
+    ///
+    /// - Parameter datasClosure: 加载数据的闭包
     open func configDatasForListView(_ datasClosure: @escaping ListViewLoadDatasClosure) {
         let closure : LoadDataClosure = { (sm, isRefresh, callback) in
             datasClosure(sm?.first?.items,isRefresh, { (err, models, hasMore) in
@@ -32,26 +37,45 @@ open class ListView<RowType> : SectionListView<EmptySection,RowType> {
         }
         configDatas(closure)
     }
+}
 
+// MARK: - 模型相关
+public extension ListView {
+
+    /// 获取模型
+    ///
+    /// - Parameter row: 行
+    /// - Returns: 模型
     public func model(of row: Int) -> RowType {
         return model(of: IndexPath.init(row: row, section: 0))
     }
     
+    /// 获取模型数组
     public var models : [RowType]? {
         return sectionModels.first?.items
     }
-}
-
-public extension ListView {
-
+    
+    /// 插入模型
+    ///
+    /// - Parameters:
+    ///   - model: 模型
+    ///   - row: 行
     public func insertModel(_ model: RowType, at row: Int) {
         insertModel(model, at: IndexPath.init(row: row, section: 0))
     }
 
+    /// 替换模型
+    ///
+    /// - Parameters:
+    ///   - model: 模型
+    ///   - row: 行
     public func replaceModel(_ model: RowType, at row: Int) {
         replaceModel(model, at: IndexPath.init(row: row, section: 0))
     }
 
+    /// 删除模型
+    ///
+    /// - Parameter row: 行
     public func deleteModel(at row: Int) {
         deleteModel(at: IndexPath.init(row: row, section: 0))
     }

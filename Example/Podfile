@@ -2,7 +2,6 @@ use_frameworks!
 
 target 'ATListView_Example' do
   pod 'ATListView', :path => '../'
-  pod 'ATRefresh', :path => '../../ATRefresh'
   target 'ATListView_Tests' do
     inherit! :search_paths
 

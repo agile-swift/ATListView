@@ -3,35 +3,135 @@
 //  ATListView
 //
 //  Created by 凯文马 on 19/12/2017.
-//
+//  组件核心文件
 
 import UIKit
 import ATRefresh
 
+/// 模型拼接方式
+///
+/// - mergeLast: 当前分页数据的第一组合并到上一页最后一组中
+/// - addToLast: 不合并，按照新分组保存
 public enum ListViewSectionMode {
     case mergeLast
     case addToLast
 }
 
+/// 注册ListView代理类型，全局唯一，建议在AppDelegate等类中，切勿使用父类
+///
+/// - Parameter delegate: 代理对象
 public func registerDefaultListViewDelegate(_ delegate : ListViewDelegate) {
     listViewDelegate = delegate
 }
 
 fileprivate var listViewDelegate : ListViewDelegate?
 
+/// 带有section的ListView
 open class SectionListView<SectionType,RowType>
 : UITableView
 , UITableViewDataSource
 , UITableViewDelegate
 {
+    
+    public convenience init(style : UITableViewStyle = .plain ,_ configCell:@escaping CellClosure) {
+        self.init(style: style, delegate: nil, configCell)
+    }
+    
+    public convenience init(headerType : RefreshHeader.Type = RefreshHeader.self ,
+                            footerType : RefreshFooter.Type = RefreshFooter.self ,
+                            _ configCell:@escaping CellClosure) {
+        self.init(style: .plain, delegate: nil, headerType: headerType, footerType: footerType, configCell)
+    }
+    
+    public convenience init(delegate : UITableViewDelegate?,
+                     headerType : RefreshHeader.Type = RefreshHeader.self ,
+                     footerType : RefreshFooter.Type = RefreshFooter.self ,
+                     _ configCell:@escaping CellClosure) {
+        self.init(style: .plain, delegate: delegate, headerType: headerType, footerType: footerType, configCell)
+    }
+    
+    /// 初始化方法
+    ///
+    /// - Parameters:
+    ///   - style: 样式
+    ///   - delegate: 代理
+    ///   - headerType: 下拉刷新组件类
+    ///   - footerType: 上拉加载更多组件类
+    ///   - configCell: 配置cell闭包
+    public init(style : UITableViewStyle = .plain,
+                delegate : UITableViewDelegate?,
+                headerType : RefreshHeader.Type = RefreshHeader.self ,
+                footerType : RefreshFooter.Type = RefreshFooter.self ,
+                _ configCell:@escaping CellClosure) {
+        
+        super.init(frame: .zero, style: style)
+        cellClosure = configCell
+        self.tableFooterView = UIView()
+        dataSourceProxy = DataSourceProxy.init(main: nil, second: self)
+        delegateProxy = DelegateProxy.init(main: delegate, second: self)
+        self.dataSource = dataSourceProxy
+        self.delegate = delegateProxy
+        
+        self.registerRefreshHeader(headerType, config: { (header) in
+            
+        }) { [unowned self] (header) in
+            self.emptyView = nil
+            self.errorView = nil
+            self.loadDataClosure?(self.sectionModels,true, self.refreshDatasCallback)
+        }
+        self.registerRefreshFooter(footerType, config: { (footer) in
+            footer.isInvalid = true
+        }) { [unowned self] (footer) in
+            self.emptyView = nil
+            self.errorView = nil
+            self.loadDataClosure?(self.sectionModels,false,self.loadMoreDatasCallback)
+        }
+    }
+    
+    /// 加载数据的回调闭包定义
     public typealias LoadDataCallback = (NSError?,[SectionModel<SectionType,RowType>]?,ListViewSectionMode,Bool)->()
     
+    /// 加载数据的闭包定义
     public typealias LoadDataClosure = ([SectionModel<SectionType,RowType>]?, Bool, @escaping LoadDataCallback)->()
     
+    /// 配置cell的闭包定义
     public typealias CellClosure = (SectionListView<SectionType,RowType>, RowType, IndexPath) -> UITableViewCell
     
+    /// 获取所有数据
     public fileprivate(set) var sectionModels : [SectionModel<SectionType,RowType>] = []
 
+    
+    /// 配置数据的方法
+    ///
+    /// - Parameter datasClosure: 配置数据闭包
+    open func configDatas(_ datasClosure : @escaping LoadDataClosure) {
+        loadDataClosure = datasClosure
+    }
+    
+    /// 加载数据，触发下拉刷新
+    open func loadData() {
+        self.refreshHeader?.beginRefresh()
+    }
+    
+//    open func configCell(_ cell : @escaping CellClosure) {
+//        self.cellClosure = cell
+//    }
+    
+    /// 配置空页面，如果没有实现此方法会通过代理方法获取空页面
+    ///
+    /// - Parameter closure: 获取空页面闭包
+    open func configEmptyView(_ closure: @escaping () -> UIView) {
+        emptyViewClosure = closure
+    }
+    
+    /// 配置错误页面，如果没有实现此方法会通过代理方法获取错误页面
+    ///
+    /// - Parameter closure: 获取错误页面闭包
+    open func configErrorView(_ closure: @escaping (NSError) -> UIView) {
+        errorViewClosure = closure
+    }
+
+    /// MARK: 私有
     fileprivate var cellClosure : CellClosure?
 
     fileprivate var dataSourceProxy : DataSourceProxy!
@@ -131,63 +231,6 @@ open class SectionListView<SectionType,RowType>
         }
         self.refreshHeader?.endRefresh()
     }
-    
-    public func model(of indexPath: IndexPath) -> RowType {
-        return sectionModels[indexPath]
-    }
-    
-    public func sectionModel(of section: Int) -> SectionModel<SectionType,RowType> {
-        return sectionModels[section]
-    }
-
-    open func configDatas(_ datasClosure : @escaping LoadDataClosure) {
-        loadDataClosure = datasClosure
-    }
-    
-    open func loadData() {
-        self.refreshHeader?.beginRefresh()
-    }
-
-    open func configCell(_ cell : @escaping CellClosure) {
-        self.cellClosure = cell
-    }
-    
-    open func configEmptyView(_ closure: @escaping () -> UIView) {
-        emptyViewClosure = closure
-    }
-    
-    open func configErrorView(_ closure: @escaping (NSError) -> UIView) {
-        errorViewClosure = closure
-    }
-
-    public convenience init(style : UITableViewStyle = .plain ,_ configCell:@escaping CellClosure) {
-        self.init(style: style, delegate: nil, configCell)
-    }
-    
-    public init(style : UITableViewStyle = .plain, delegate : UITableViewDelegate?, headerType : RefreshHeader.Type = RefreshHeader.self , footerType : RefreshFooter.Type = RefreshFooter.self ,_ configCell:@escaping CellClosure) {
-        super.init(frame: .zero, style: style)
-        cellClosure = configCell
-        self.tableFooterView = UIView()
-        dataSourceProxy = DataSourceProxy.init(main: nil, second: self)
-        delegateProxy = DelegateProxy.init(main: delegate, second: self)
-        self.dataSource = dataSourceProxy
-        self.delegate = delegateProxy
-        
-        self.registerRefreshHeader(headerType, config: { (header) in
-            
-        }) { [unowned self] (header) in
-            self.emptyView = nil
-            self.errorView = nil
-            self.loadDataClosure?(self.sectionModels,true, self.refreshDatasCallback)
-        }
-        self.registerRefreshFooter(footerType, config: { (footer) in
-            footer.isInvalid = true
-        }) { [unowned self] (footer) in
-            self.emptyView = nil
-            self.errorView = nil
-            self.loadDataClosure?(self.sectionModels,false,self.loadMoreDatasCallback)
-        }
-    }
 
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -266,6 +309,15 @@ open class SectionListView<SectionType,RowType>
 }
 
 public extension SectionListView {
+    
+    public func model(of indexPath: IndexPath) -> RowType {
+        return sectionModels[indexPath]
+    }
+    
+    public func sectionModel(of section: Int) -> SectionModel<SectionType,RowType> {
+        return sectionModels[section]
+    }
+    
     public func insertSectionModel(_ model: SectionModel<SectionType,RowType>, at section: Int) {
         sectionModels.insert(model, at: section)
     }

@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// section 模型协议
 public protocol SectionModelType {
     associatedtype SectionElement
     associatedtype RowElement
@@ -16,6 +17,7 @@ public protocol SectionModelType {
     init(title : SectionElement,items:[RowElement])
 }
 
+/// section 模型类
 public struct SectionModel<SectionElement,RowElement> : SectionModelType {
     typealias S = SectionElement
     typealias R = RowElement
