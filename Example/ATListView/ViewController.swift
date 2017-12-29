@@ -54,21 +54,15 @@ class ViewController: UIViewController {
         loadListView()
     }
     
-//    func loadAAA() {
-//        let listView = ListView<Int>.init(style: .plain, delegate: self, headerType: GifRefreshHeader.self, footerType: RefreshFooter.self) { (<#SectionListView<EmptySection, Int>#>, <#Int#>, <#IndexPath#>) -> UITableViewCell in
-//            <#code#>
-//        }
-//    }
-    
     func loadListView() {
-        let listView = ListView<String>.init(style: .plain, delegate: self, headerType: GifRefreshHeader.self, footerType: RefreshFooter.self) { (lv, m, ip) -> UITableViewCell in
+        let listView = ListView<String>.init(style: .plain, delegate: self, headerType: GifRefreshHeader.self, footerType: RefreshFooter.self) { (lv, m, index) -> UITableViewCell in
             let cell = UITableViewCell.init(style: .default, reuseIdentifier: "")
-            cell.textLabel?.text = m + " in \(ip)"
+            cell.textLabel?.text = m + " in \(index)"
             if let view = cell.contentView.viewWithTag(1317749) {
-                view.frame = CGRect.init(x: 10, y: 30, width: 20, height: 20 * ip.section)
+                view.frame = CGRect.init(x: 10, y: 30, width: 20, height: 20)
                 
             } else {
-                let v = UIView.init(frame: CGRect.init(x: 10, y: 30, width: 20, height: 20 * ip.section))
+                let v = UIView.init(frame: CGRect.init(x: 10, y: 30, width: 20, height: 20 ))
                 v.backgroundColor = UIColor.purple
                 v.tag = 1317749
                 cell.contentView.addSubview(v)

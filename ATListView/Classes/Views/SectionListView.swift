@@ -32,24 +32,6 @@ open class SectionListView<SectionType,RowType>
 , UITableViewDataSource
 , UITableViewDelegate
 {
-    
-    public convenience init(style : UITableViewStyle = .plain ,_ configCell:@escaping CellClosure) {
-        self.init(style: style, delegate: nil, configCell)
-    }
-    
-    public convenience init(headerType : RefreshHeader.Type = RefreshHeader.self ,
-                            footerType : RefreshFooter.Type = RefreshFooter.self ,
-                            _ configCell:@escaping CellClosure) {
-        self.init(style: .plain, delegate: nil, headerType: headerType, footerType: footerType, configCell)
-    }
-    
-    public convenience init(delegate : UITableViewDelegate?,
-                     headerType : RefreshHeader.Type = RefreshHeader.self ,
-                     footerType : RefreshFooter.Type = RefreshFooter.self ,
-                     _ configCell:@escaping CellClosure) {
-        self.init(style: .plain, delegate: delegate, headerType: headerType, footerType: footerType, configCell)
-    }
-    
     /// 初始化方法
     ///
     /// - Parameters:
@@ -59,9 +41,9 @@ open class SectionListView<SectionType,RowType>
     ///   - footerType: 上拉加载更多组件类
     ///   - configCell: 配置cell闭包
     public init(style : UITableViewStyle = .plain,
-                delegate : UITableViewDelegate?,
-                headerType : RefreshHeader.Type = RefreshHeader.self ,
-                footerType : RefreshFooter.Type = RefreshFooter.self ,
+                delegate : UITableViewDelegate? = nil,
+                headerType : RefreshHeader.Type ,
+                footerType : RefreshFooter.Type ,
                 _ configCell:@escaping CellClosure) {
         
         super.init(frame: .zero, style: style)

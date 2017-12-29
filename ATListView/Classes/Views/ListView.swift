@@ -25,6 +25,19 @@ open class ListView<RowType> : SectionListView<EmptySection,RowType> {
 
     public typealias ListViewLoadDatasClosure = ([RowType]?, Bool, @escaping (NSError?, [RowType]?, Bool) -> ()) -> ()
 
+    /// 配置cell的闭包定义
+    public typealias ListViewCellClosure = (ListView<RowType>, RowType, Int) -> UITableViewCell
+    
+    public init(style: UITableViewStyle, delegate: UITableViewDelegate?, headerType: RefreshHeader.Type, footerType: RefreshFooter.Type, _ configCell: @escaping ListViewCellClosure) {
+        super.init(style: style, delegate: delegate, headerType: headerType, footerType: footerType) { (listView, model, indexPath) -> UITableViewCell in
+            configCell(listView as! ListView<RowType>,model,indexPath.row)
+        }
+    }
+    
+    required public init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     /// 配置加载数据的方法
     ///
     /// - Parameter datasClosure: 加载数据的闭包
