@@ -164,9 +164,8 @@ open class SectionListView<SectionType,RowType>
     
     fileprivate lazy var loadMoreDatasCallback : LoadDataCallback = { [unowned self] (err, sections, mode, showMore) in
         if err == nil {
-            if sections == nil || sections!.isEmpty {
-                // empty
-                self.loadEmptyView()
+            if sections == nil || sections!.isEmpty || sections!.first!.items.isEmpty {
+                
             } else {
                 // has data
                 switch mode {
@@ -196,7 +195,7 @@ open class SectionListView<SectionType,RowType>
     
     fileprivate lazy var refreshDatasCallback : LoadDataCallback = { [unowned self] (err, sections, mode, showMore) in
         if err == nil {
-            if sections == nil || sections!.isEmpty {
+            if sections == nil || sections!.isEmpty || sections!.first!.items.isEmpty {
                 // count = 0
                 self.sectionModels = []
                 self.loadEmptyView()

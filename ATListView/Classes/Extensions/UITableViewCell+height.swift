@@ -22,14 +22,16 @@ public extension UITableViewCell {
     /// contentView最底部视图距cell底部的距离
     public var autoBottomViewSpace : CGFloat? {
         get {
-            return objc_getAssociatedObject(self, &BottomViewSpaceKey) as? CGFloat
+            let v = objc_getAssociatedObject(self, &BottomViewSpaceKey) as? NSNumber
+            return  v != nil ? CGFloat(v!.floatValue) : nil
         }
         set {
             var value = newValue
             if value != nil {
                 value = max(0, value!)
             }
-            objc_setAssociatedObject(self, &BottomViewSpaceKey, value, .OBJC_ASSOCIATION_ASSIGN)
+            let v = value != nil ? NSNumber.init(value: Float(value!)) : nil
+            objc_setAssociatedObject(self, &BottomViewSpaceKey, v, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
     
@@ -52,6 +54,7 @@ public extension UITableViewCell {
                 if (view.tag != ViewTag.unignore.rawValue && view.tag != ViewTag.ignore.rawValue && !view.isHidden && view.alpha >= 0.1) ||
                     view.tag == ViewTag.unignore.rawValue{
                         let btm = view.frame.maxY
+                        autoBottomView = view
                         return max(btm, maxBottom)
                 }
                 return maxBottom + (autoBottomViewSpace ?? 0)
