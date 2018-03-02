@@ -1,7 +1,11 @@
+#encoding: UTF-8
+source "http://new.gitlab.hui10.com/Hui10-iOS/Hui10Repos.git"
+source "https://github.com/CocoaPods/Specs.git"
 use_frameworks!
-
+platform :ios, '9.0'
 target 'ATListView_Example' do
   pod 'ATListView', :path => '../'
+  pod 'ATRefresh',:path=> '../../ATRefresh'
   target 'ATListView_Tests' do
     inherit! :search_paths
 

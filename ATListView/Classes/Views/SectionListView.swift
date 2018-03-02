@@ -49,10 +49,8 @@ open class SectionListView<SectionType,RowType>
         super.init(frame: .zero, style: style)
         cellClosure = configCell
         self.tableFooterView = UIView()
-        dataSourceProxy = DataSourceProxy.init(main: nil, second: self)
-        delegateProxy = DelegateProxy.init(main: delegate, second: self)
-        self.dataSource = dataSourceProxy
-        self.delegate = delegateProxy
+        self.dataSource = nil
+        self.delegate = delegate
         
         self.registerRefreshHeader(headerType, config: { (header) in
             
@@ -116,9 +114,9 @@ open class SectionListView<SectionType,RowType>
     /// MARK: 私有
     fileprivate var cellClosure : CellClosure?
 
-    fileprivate var dataSourceProxy : DataSourceProxy!
+    fileprivate var dataSourceProxy : DataSourceProxy?
     
-    fileprivate var delegateProxy : DelegateProxy!
+    fileprivate var delegateProxy : DelegateProxy?
     
     fileprivate var emptyViewClosure : (() -> UIView)?
     
@@ -239,10 +237,13 @@ open class SectionListView<SectionType,RowType>
     // MARK: 私有重写
     open override var delegate: UITableViewDelegate? {
         set {
-            if newValue !== delegateProxy {
-                self.delegateProxy.mainProxy = newValue
+            guard let newDelegate = newValue as? DelegateProxy else {
+                let tempDelegate = DelegateProxy.delegate(withMainProxy: newValue, secondProxy: self, for: newValue)
+                self.delegateProxy = tempDelegate
+                super.delegate = tempDelegate
+                return
             }
-            super.delegate = delegateProxy
+            super.delegate = newDelegate
         }
         get {
             return super.delegate
@@ -251,15 +252,16 @@ open class SectionListView<SectionType,RowType>
     
     open override var dataSource: UITableViewDataSource? {
         set {
-            if newValue === dataSourceProxy {
-                super.dataSource = newValue
+            guard let newDataSource = newValue as? DataSourceProxy else {
+                let tempDelegate = DataSourceProxy.dataSource(withMainProxy: self, secondProxy: newValue, for: newValue)
+                self.dataSourceProxy = tempDelegate
+                super.dataSource = tempDelegate
                 return
             }
-            self.dataSourceProxy.mainProxy = newValue
+            super.dataSource = newDataSource
         }
         get {
-            let temp = self.dataSourceProxy.mainProxy
-            return temp
+            return super.dataSource
         }
     }
     

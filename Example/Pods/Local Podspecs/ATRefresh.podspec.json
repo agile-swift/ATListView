@@ -1,6 +1,6 @@
 {
   "name": "ATRefresh",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "summary": "A short description of ATRefresh.",
   "description": "TODO: Add long description of the pod here.",
   "homepage": "https://github.com/agile-swift/ATRefresh",
@@ -13,7 +13,7 @@
   },
   "source": {
     "git": "https://github.com/agile-swift/ATRefresh.git",
-    "tag": "0.1.1"
+    "tag": "0.1.2"
   },
   "platforms": {
     "ios": "9.0"

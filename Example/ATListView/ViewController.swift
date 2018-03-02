@@ -50,8 +50,8 @@ class ViewController: UIViewController {
         
         registerDefaultListViewDelegate(self)
         
-//        loadSectionListView()
-        loadListView()
+        loadSectionListView()
+//        loadListView()
     }
     
     func loadListView() {
