@@ -28,9 +28,9 @@ fileprivate var listViewDelegate : ListViewDelegate?
 
 /// 带有section的ListView
 open class SectionListView<SectionType,RowType>
-: UITableView
-, UITableViewDataSource
-, UITableViewDelegate
+    : UITableView
+    , UITableViewDataSource
+    , UITableViewDelegate
 {
     /// 初始化方法
     ///
@@ -79,7 +79,7 @@ open class SectionListView<SectionType,RowType>
     
     /// 获取所有数据
     public fileprivate(set) var sectionModels : [SectionModel<SectionType,RowType>] = []
-
+    
     
     /// 配置数据的方法
     ///
@@ -93,9 +93,9 @@ open class SectionListView<SectionType,RowType>
         self.refreshHeader?.beginRefresh()
     }
     
-//    open func configCell(_ cell : @escaping CellClosure) {
-//        self.cellClosure = cell
-//    }
+    //    open func configCell(_ cell : @escaping CellClosure) {
+    //        self.cellClosure = cell
+    //    }
     
     /// 配置空页面，如果没有实现此方法会通过代理方法获取空页面
     ///
@@ -110,10 +110,12 @@ open class SectionListView<SectionType,RowType>
     open func configErrorView(_ closure: @escaping (NSError) -> UIView) {
         errorViewClosure = closure
     }
-
+    
     /// MARK: 私有
+    fileprivate var deallocing : Bool = false
+    
     fileprivate var cellClosure : CellClosure?
-
+    
     fileprivate var dataSourceProxy : DataSourceProxy?
     
     fileprivate var delegateProxy : DelegateProxy?
@@ -157,7 +159,7 @@ open class SectionListView<SectionType,RowType>
             }
         }
     }
-
+    
     fileprivate var loadDataClosure : LoadDataClosure?
     
     fileprivate lazy var loadMoreDatasCallback : LoadDataCallback = { [unowned self] (err, sections, mode, showMore) in
@@ -170,7 +172,7 @@ open class SectionListView<SectionType,RowType>
                 case .mergeLast:
                     var new = sections!
                     if let newFirst = new.first,
-                       let oldLast = self.sectionModels.last {
+                        let oldLast = self.sectionModels.last {
                         self.sectionModels.removeLast()
                         new.removeFirst()
                         let mergeOne = SectionModel<SectionType,RowType>.init(title: newFirst.title, items: oldLast.items + newFirst.items)
@@ -210,7 +212,7 @@ open class SectionListView<SectionType,RowType>
         }
         self.refreshHeader?.endRefresh()
     }
-
+    
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -237,6 +239,10 @@ open class SectionListView<SectionType,RowType>
     // MARK: 私有重写
     open override var delegate: UITableViewDelegate? {
         set {
+            if deallocing {
+                super.delegate = nil
+                return
+            }
             guard let newDelegate = newValue as? DelegateProxy else {
                 let tempDelegate = DelegateProxy.delegate(withMainProxy: newValue, secondProxy: self, for: newValue)
                 self.delegateProxy = tempDelegate
@@ -250,8 +256,17 @@ open class SectionListView<SectionType,RowType>
         }
     }
     
+    deinit {
+        deallocing = true
+        removeRefreshViews()
+    }
+    
     open override var dataSource: UITableViewDataSource? {
         set {
+            if deallocing {
+                super.dataSource = nil
+                return
+            }
             guard let newDataSource = newValue as? DataSourceProxy else {
                 let tempDelegate = DataSourceProxy.dataSource(withMainProxy: self, secondProxy: newValue, for: newValue)
                 self.dataSourceProxy = tempDelegate
