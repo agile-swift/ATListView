@@ -16,7 +16,7 @@ public protocol ListViewDelegate {
     ///   - listView: ListView
     ///   - userinfo: 自定义参数
     /// - Returns: 空页面
-    func listView(_ listView: UIScrollView, emptyViewFor userinfo: [AnyHashable : Any]?) -> UIView?
+    func listView(_ listView: UIScrollView, emptyView frame: CGRect, for userinfo: [AnyHashable : Any]?) -> UIView?
     
     /// 设置错误页面
     ///
@@ -24,16 +24,16 @@ public protocol ListViewDelegate {
     ///   - listView: ListView
     ///   - error: 错误信息
     /// - Returns: 错误页面
-    func listView(_ listView: UIScrollView, errorViewFor error: NSError) -> UIView?
+    func listView(_ listView: UIScrollView, errorView frame: CGRect, for error: NSError) -> UIView?
 }
 
 public extension ListViewDelegate {
 
-    public func listView(_ listView: UIScrollView, errorViewFor error: NSError) -> UIView? {
+    public func listView(_ listView: UIScrollView, emptyView frame: CGRect, for userinfo: [AnyHashable : Any]?) -> UIView? {
         return nil
     }
     
-    public func listView(_ listView: UIScrollView, emptyViewFor userinfo: [AnyHashable : Any]?) -> UIView? {
+    public func listView(_ listView: UIScrollView, errorView frame: CGRect, for error: NSError) -> UIView? {
         return nil
     }
 }

@@ -50,8 +50,8 @@ class ViewController: UIViewController {
         
         registerDefaultListViewDelegate(self)
         
-        loadSectionListView()
-//        loadListView()
+//        loadSectionListView()
+        loadListView()
     }
     
     func loadListView() {
@@ -72,14 +72,15 @@ class ViewController: UIViewController {
             return cell
         }
         listView.frame = CGRect.init(x: 0, y: 64, width: view.frame.width, height: view.frame.height - 64)
-//        listView.contentInset.top = 64
+        listView.tableHeaderView = UIView.init(frame: CGRect.init(x: 0, y: 100, width: listView.frame.width, height: 100))
         listView.configDatasForListView { (models, isRefresh, cb) in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4, execute: {
                 var a = (self.sections.first?.items)!
                 a += a
                 a += a
                 a += a
-                cb(nil,a,true)
+//                cb(nil,a,true)
+                cb(NSError.init(domain: "fdf", code: 434, userInfo: [NSLocalizedDescriptionKey : "fdfds"]),nil,false)
             })
         }
 //        listView.loadDatasConfig { (sm, r, cb) in
@@ -90,37 +91,38 @@ class ViewController: UIViewController {
         view.addSubview(listView)
         listView.loadData()
         
-        listView.configEmptyView { [unowned self] () -> UIView in
-            self.listView = listView
-            let v = UIView.init(frame: listView.frame)
-            v.backgroundColor = UIColor.orange
-            let b = UIButton()
-            b.setTitle(" 重新加载 ", for: .normal)
-            b.setTitleColor(UIColor.white, for: .normal)
-            b.setTitleColor(UIColor.gray, for: .highlighted)
-            b.sizeToFit()
-            v.addSubview(b)
-            b.center = CGPoint.init(x: v.frame.width * 0.5, y: v.frame.height * 0.5)
-            b.addTarget(self, action: #selector(self.reload), for: .touchUpInside)
-            return v
-        }
-        listView.configErrorView { (err) -> UIView in
-            self.listView = listView
-            let c = UIView.init(frame: listView.frame)
-            let v = UILabel.init(frame: c.bounds)
-            v.backgroundColor = UIColor.purple
-            v.textAlignment = .center
-            v.isUserInteractionEnabled = true
-            v.text = err.userInfo[NSLocalizedDescriptionKey] as! String
-            let b = UIButton()
-            b.setTitle(" (失败)重新加载 ", for: .normal)
-            b.sizeToFit()
-            c.addSubview(v)
-            c.addSubview(b)
-            b.center = CGPoint.init(x: v.frame.width * 0.5, y: v.frame.height * 0.3)
-            b.addTarget(self, action: #selector(self.reload), for: .touchUpInside)
-            return c
-        }
+//        listView.configEmptyView { [unowned self] (frame) -> UIView in
+//            self.listView = listView
+//            let v = UIView.init(frame: frame)
+//            v.backgroundColor = UIColor.orange
+//            let b = UIButton()
+//            b.setTitle(" 重新加载 ", for: .normal)
+//            b.setTitleColor(UIColor.white, for: .normal)
+//            b.setTitleColor(UIColor.gray, for: .highlighted)
+//            b.sizeToFit()
+//            v.addSubview(b)
+//            b.center = CGPoint.init(x: v.frame.width * 0.5, y: v.frame.height * 0.5)
+//            b.addTarget(self, action: #selector(self.reload), for: .touchUpInside)
+//            return v
+//        }
+//        listView.configErrorView { (err,frame) -> UIView in
+//            self.listView = listView
+//            let c = UIView.init(frame: frame)
+//            let v = UILabel.init(frame: c.bounds)
+//            v.backgroundColor = UIColor.purple
+//            v.textAlignment = .center
+//            v.isUserInteractionEnabled = true
+//            v.text = err.userInfo[NSLocalizedDescriptionKey] as! String
+//            let b = UIButton()
+//            b.setTitle(" (失败)重新加载 ", for: .normal)
+//            b.sizeToFit()
+//            c.addSubview(v)
+//            c.addSubview(b)
+//            b.center = CGPoint.init(x: v.frame.width * 0.5, y: v.frame.height * 0.3)
+//            b.addTarget(self, action: #selector(self.reload), for: .touchUpInside)
+//            return c
+//        }
+        
 //        listView.sectionModels
 //        listView.dele
         
@@ -193,9 +195,9 @@ extension ViewController : UITableViewDataSource {
 }
 
 extension ViewController : ListViewDelegate {
-    func listView(_ listView: UIScrollView, errorViewFor error: NSError) -> UIView? {
+    func listView(_ listView: UIScrollView, errorView frame: CGRect, for error: NSError) -> UIView? {
         self.listView = listView
-        let c = UIView.init(frame: listView.frame)
+        let c = UIView.init(frame: frame)
         let v = UILabel.init(frame: c.bounds)
         v.backgroundColor = UIColor.yellow
         v.textAlignment = .center
@@ -211,9 +213,9 @@ extension ViewController : ListViewDelegate {
         return c
     }
     
-    func emptyViewForListView(_ listView: UIScrollView) -> UIView? {
+    func listView(_ listView: UIScrollView, emptyView frame: CGRect, for userinfo: [AnyHashable : Any]?) -> UIView? {
         self.listView = listView
-        let v = UIView.init(frame: listView.frame)
+        let v = UIView.init(frame: frame)
         v.backgroundColor = UIColor.green
         let b = UIButton()
         b.setTitle(" 重新加载 ", for: .normal)

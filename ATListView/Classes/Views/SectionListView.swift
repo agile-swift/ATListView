@@ -55,9 +55,9 @@ open class SectionListView<SectionType,RowType>
         self.registerRefreshHeader(headerType, config: { (header) in
             
         }) { [unowned self] (header) in
-            self.emptyView = nil
-            self.errorView = nil
             self.loadDataClosure?(self.sectionModels,true, self.refreshDatasCallback)
+//            self.emptyView = nil
+//            self.errorView = nil
         }
         self.registerRefreshFooter(footerType, config: { (footer) in
             footer.isInvalid = true
@@ -100,14 +100,14 @@ open class SectionListView<SectionType,RowType>
     /// 配置空页面，如果没有实现此方法会通过代理方法获取空页面
     ///
     /// - Parameter closure: 获取空页面闭包
-    open func configEmptyView(_ closure: @escaping () -> UIView) {
+    open func configEmptyView(_ closure: @escaping (CGRect) -> UIView) {
         emptyViewClosure = closure
     }
     
     /// 配置错误页面，如果没有实现此方法会通过代理方法获取错误页面
     ///
     /// - Parameter closure: 获取错误页面闭包
-    open func configErrorView(_ closure: @escaping (NSError) -> UIView) {
+    open func configErrorView(_ closure: @escaping (NSError,CGRect) -> UIView) {
         errorViewClosure = closure
     }
     
@@ -120,22 +120,24 @@ open class SectionListView<SectionType,RowType>
     
     fileprivate var delegateProxy : DelegateProxy?
     
-    fileprivate var emptyViewClosure : (() -> UIView)?
+    fileprivate var emptyViewClosure : ((CGRect) -> UIView)?
     
-    fileprivate var errorViewClosure : ((NSError) -> UIView)?
+    fileprivate var errorViewClosure : ((NSError,CGRect) -> UIView)?
     
     fileprivate weak var emptyView : UIView? {
         didSet {
             if oldValue == emptyView { return }
             oldValue?.removeFromSuperview()
             if emptyView != nil {
-                self.isHidden = true
+//                self.isHidden = true
                 emptyView?.isHidden = false
-                emptyView?.alpha = 0
-                self.superview?.insertSubview(emptyView!, aboveSubview: self)
-                UIView.animate(withDuration: 0.3, animations: {
-                    self.emptyView?.alpha = 1.0
-                })
+//                emptyView?.alpha = 0
+                emptyView?.frame = CGRect.init(x: 0, y: self.tableHeaderView?.frame.height ?? 0, width: self.frame.width, height: self.frame.size.height - (tableHeaderView?.frame.height ?? 0))
+                self.addSubview(emptyView!)
+//                self.superview?.insertSubview(emptyView!, aboveSubview: self)
+//                UIView.animate(withDuration: 0.3, animations: {
+//                    self.emptyView?.alpha = 1.0
+//                })
             } else {
                 self.isHidden = false
             }
@@ -147,13 +149,15 @@ open class SectionListView<SectionType,RowType>
             if oldValue == errorView { return }
             oldValue?.removeFromSuperview()
             if errorView != nil {
-                self.isHidden = true
+//                self.isHidden = true
                 errorView?.isHidden = false
-                errorView?.alpha = 0
-                self.superview?.insertSubview(errorView!, aboveSubview: self)
-                UIView.animate(withDuration: 0.3, animations: {
-                    self.errorView?.alpha = 1.0
-                })
+//                errorView?.alpha = 0
+                errorView?.frame = CGRect.init(x: 0, y: self.tableHeaderView?.frame.height ?? 0, width: self.frame.width, height: self.frame.size.height - (tableHeaderView?.frame.height ?? 0))
+                self.addSubview(errorView!)
+//                self.superview?.insertSubview(errorView!, aboveSubview: self)
+//                UIView.animate(withDuration: 0.3, animations: {
+//                    self.errorView?.alpha = 1.0
+//                })
             } else {
                 self.isHidden = false
             }
@@ -163,6 +167,8 @@ open class SectionListView<SectionType,RowType>
     fileprivate var loadDataClosure : LoadDataClosure?
     
     fileprivate lazy var loadMoreDatasCallback : LoadDataCallback = { [unowned self] (err, sections, mode, showMore) in
+        self.errorView = nil
+        self.emptyView = nil
         if err == nil {
             if sections == nil || sections!.isEmpty || sections!.first!.items.isEmpty {
                 
@@ -194,6 +200,8 @@ open class SectionListView<SectionType,RowType>
     }
     
     fileprivate lazy var refreshDatasCallback : LoadDataCallback = { [unowned self] (err, sections, mode, showMore) in
+        self.errorView = nil
+        self.emptyView = nil
         if err == nil {
             if sections == nil || sections!.isEmpty || sections!.first!.items.isEmpty {
                 // count = 0
@@ -221,17 +229,19 @@ open class SectionListView<SectionType,RowType>
     
     // MARK: 私有方法
     fileprivate func loadEmptyView() {
-        var emptyView = self.emptyViewClosure?()
+        let frame = CGRect.init(x: 0, y: self.tableHeaderView?.frame.height ?? 0, width: self.frame.width, height: self.frame.size.height - (tableHeaderView?.frame.height ?? 0))
+        var emptyView = self.emptyViewClosure?(frame)
         if emptyView == nil {
-            emptyView = listViewDelegate?.listView(self, emptyViewFor: emptyUserInfo)
+            emptyView = listViewDelegate?.listView(self, emptyView: frame, for: emptyUserInfo)
         }
         self.emptyView = emptyView
     }
     
     fileprivate func loadErrorView(_ error: NSError) {
-        var errorView = self.errorViewClosure?(error)
+        let frame = CGRect.init(x: 0, y: self.tableHeaderView?.frame.height ?? 0, width: self.frame.width, height: self.frame.size.height - (tableHeaderView?.frame.height ?? 0))
+        var errorView = self.errorViewClosure?(error,frame)
         if errorView == nil {
-            errorView = listViewDelegate?.listView(self, errorViewFor: error)
+            errorView = listViewDelegate?.listView(self, errorView: frame, for: error)
         }
         self.errorView = errorView
     }

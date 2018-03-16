@@ -10,8 +10,9 @@
 #endif
 #endif
 
+#import "DataSourceProxy.h"
+#import "DelegateProxy.h"
 
 FOUNDATION_EXPORT double ATListViewVersionNumber;
 FOUNDATION_EXPORT const unsigned char ATListViewVersionString[];
 
-#import "ProxyMaker.h"
