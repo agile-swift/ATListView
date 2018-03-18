@@ -242,7 +242,7 @@ open class SectionListView<SectionType,RowType>
                 return
             }
             guard let newDelegate = newValue as? DelegateProxy else {
-                let tempDelegate = DelegateProxy.delegate(withMainProxy: newValue, secondProxy: self, for: newValue)
+                let tempDelegate = DelegateProxy.delegate(withListView: self, realDelegate: newValue, for: newValue)
                 self.delegateProxy = tempDelegate
                 super.delegate = tempDelegate
                 return
@@ -266,7 +266,7 @@ open class SectionListView<SectionType,RowType>
                 return
             }
             guard let newDataSource = newValue as? DataSourceProxy else {
-                let tempDelegate = DataSourceProxy.dataSource(withMainProxy: self, secondProxy: newValue, for: newValue)
+                let tempDelegate = DataSourceProxy.dataSource(withListView: self, realDataSource: newValue, for: newValue)
                 self.dataSourceProxy = tempDelegate
                 super.dataSource = tempDelegate
                 return

@@ -10,14 +10,12 @@
 
 @interface DataSourceProxy : NSObject <UITableViewDataSource>
 
-+ (instancetype)dataSourceWithMainProxy:(id<UITableViewDataSource>)main secondProxy:(id<UITableViewDataSource>)second forObject:(id)object;
++ (instancetype)dataSourceWithListView:(id<UITableViewDataSource>)listView realDataSource:(id<UITableViewDataSource>)realDataSource forObject:(id)object;
 
-- (instancetype)initWithMainProxy:(id<UITableViewDataSource>)main secondProxy:(id<UITableViewDataSource>)second;
+- (instancetype)initWithListView:(id<UITableViewDataSource>)listView realDataSource:(id<UITableViewDataSource>)realDataSource;
 
-@property (nonatomic, weak) id<UITableViewDataSource> mainProxy;
+@property (nonatomic, weak, readonly) id<UITableViewDataSource> listView;
 
-@property (nonatomic, weak) id<UITableViewDataSource> secondProxy;
-
-- (void)exchangeProxy;
+@property (nonatomic, weak, readonly) id<UITableViewDataSource> realDataSource;
 
 @end

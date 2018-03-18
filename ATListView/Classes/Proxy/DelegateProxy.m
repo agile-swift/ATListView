@@ -10,23 +10,29 @@
 
 static NSMutableDictionary *delegateClassMap = nil;
 
+@interface DelegateProxy ()
+
+@property (nonatomic, weak) id<UITableViewDelegate> heightResponser;
+
+@end
+
 @implementation DelegateProxy
 
-+ (instancetype)delegateWithMainProxy:(id<UITableViewDelegate>)main secondProxy:(id<UITableViewDelegate>)second forObject:(id)object
++ (instancetype)delegateWithListView:(id<UITableViewDelegate>)listView realDelegate:(id<UITableViewDelegate>)realDelegate forObject:(id)object
 {
     NSString *clsN = NSStringFromClass([object class]);
     if (clsN == nil) {
-        return [[DelegateProxy alloc] initWithMainProxy:main secondProxy:second];
+        return [[DelegateProxy alloc] initWithListView:listView realDelegate:realDelegate];
     }
     NSMutableDictionary *map = self.classMap;
     Class cls = map[clsN];
     if (cls) {
-        return [[cls alloc] initWithMainProxy:main secondProxy:second];
+        return [[cls alloc] initWithListView:listView realDelegate:realDelegate];
     }
     
     cls = objc_allocateClassPair([DelegateProxy class], [NSString stringWithFormat:@"%@_DelegateProxy",clsN].UTF8String, 0);
     map[clsN] = cls;
-    return [[cls alloc] initWithMainProxy:main secondProxy:second];
+    return [[cls alloc] initWithListView:listView realDelegate:realDelegate];
 }
 
 + (NSMutableDictionary *)classMap
@@ -38,43 +44,39 @@ static NSMutableDictionary *delegateClassMap = nil;
     return delegateClassMap;
 }
 
-- (instancetype)initWithMainProxy:(id<UITableViewDelegate>)main secondProxy:(id<UITableViewDelegate>)second
+- (instancetype)initWithListView:(id<UITableViewDelegate>)listView realDelegate:(id<UITableViewDelegate>)realDelegate
 {
     self = [super init];
     if (self) {
-        _mainProxy = main;
-        _secondProxy = second;
+        _listView = listView;
+        _realDelegate = realDelegate;
+        _heightResponser = listView;
     }
     return self;
 }
 
-- (void)exchangeProxy
-{
-    if (!self.mainProxy || !self.secondProxy) {
-        return;
-    }
-    id temp = self.mainProxy;
-    self.mainProxy = self.secondProxy;
-    self.secondProxy = temp;
-}
-
 - (BOOL)respondsToSelector:(SEL)aSelector
 {
-    BOOL sp = [super respondsToSelector:aSelector];
-    BOOL m = [self.mainProxy respondsToSelector:aSelector];
-    BOOL s = [self.secondProxy respondsToSelector:aSelector];
-    return sp || m || s;
+    
+    if ([_realDelegate respondsToSelector:aSelector]) {
+        if ([NSStringFromSelector(aSelector) isEqualToString:@"tableView:heightForRowAtIndexPath:"]) {
+            _heightResponser = _realDelegate;
+        }
+        return YES;
+    } else if ([super respondsToSelector:aSelector]) {
+        return YES;
+    }
+    return NO;
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return [_heightResponser tableView:tableView heightForRowAtIndexPath:indexPath];
+}
 
 - (id)forwardingTargetForSelector:(SEL)aSelector
 {
-    if ([_mainProxy respondsToSelector:aSelector]) {
-        return _mainProxy;
-    } else if ([_secondProxy respondsToSelector:aSelector]) {
-        return _secondProxy;
-    }
-    return [super forwardingTargetForSelector:aSelector];
+    return _realDelegate;
 }
 
 @end

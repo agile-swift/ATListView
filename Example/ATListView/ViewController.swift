@@ -79,8 +79,8 @@ class ViewController: UIViewController {
                 a += a
                 a += a
                 a += a
-//                cb(nil,a,true)
-                cb(NSError.init(domain: "fdf", code: 434, userInfo: [NSLocalizedDescriptionKey : "fdfds"]),nil,false)
+                cb(nil,a,true)
+//                cb(NSError.init(domain: "fdf", code: 434, userInfo: [NSLocalizedDescriptionKey : "fdfds"]),nil,false)
             })
         }
 //        listView.loadDatasConfig { (sm, r, cb) in

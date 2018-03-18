@@ -12,21 +12,21 @@ static NSMutableDictionary *dataSourceClassMap = nil;
 
 @implementation DataSourceProxy
 
-+ (instancetype)dataSourceWithMainProxy:(id<UITableViewDataSource>)main secondProxy:(id<UITableViewDataSource>)second forObject:(id)object
++ (instancetype)dataSourceWithListView:(id<UITableViewDataSource>)listView realDataSource:(id<UITableViewDataSource>)realDataSource forObject:(id)object
 {
     NSString *clsN = NSStringFromClass([object class]);
     if (clsN == nil) {
-        return [[DataSourceProxy alloc] initWithMainProxy:main secondProxy:second];
+        return [[DataSourceProxy alloc] initWithListView:listView realDataSource:realDataSource];
     }
     NSMutableDictionary *map = self.classMap;
     Class cls = map[clsN];
     if (cls) {
-        return [[cls alloc] initWithMainProxy:main secondProxy:second];
+        return [[cls alloc] initWithListView:listView realDataSource:realDataSource];
     }
     
     cls = objc_allocateClassPair([DataSourceProxy class], [NSString stringWithFormat:@"%@_DelegateProxy",clsN].UTF8String, 0);
     map[clsN] = cls;
-    return [[cls alloc] initWithMainProxy:main secondProxy:second];
+    return [[cls alloc] initWithListView:listView realDataSource:realDataSource];
 }
 
 + (NSMutableDictionary *)classMap
@@ -38,68 +38,43 @@ static NSMutableDictionary *dataSourceClassMap = nil;
     return dataSourceClassMap;
 }
 
-- (instancetype)initWithMainProxy:(id<UITableViewDataSource>)main secondProxy:(id<UITableViewDataSource>)second
+- (instancetype)initWithListView:(id<UITableViewDataSource>)listView realDataSource:(id<UITableViewDataSource>)realDataSource
 {
     self = [super init];
     if (self) {
-        _mainProxy = main;
-        _secondProxy = second;
+        _listView = listView;
+        _realDataSource = realDataSource;
     }
     return self;
 }
 
-- (void)exchangeProxy
-{
-    if (!self.mainProxy || !self.secondProxy) {
-        return;
-    }
-    id temp = self.mainProxy;
-    self.mainProxy = self.secondProxy;
-    self.secondProxy = temp;
-}
-
 - (BOOL)respondsToSelector:(SEL)aSelector
 {
-    BOOL sp = [super respondsToSelector:aSelector];
-    BOOL m = [self.mainProxy respondsToSelector:aSelector];
-    BOOL s = [self.secondProxy respondsToSelector:aSelector];
-    return sp || m || s;
+    if ([_realDataSource respondsToSelector:aSelector]) {
+        return YES;
+    } else if ([super respondsToSelector:aSelector]) {
+        return YES;
+    }
+    return NO;
 }
 
 
 - (id)forwardingTargetForSelector:(SEL)aSelector
 {
-    if ([_mainProxy respondsToSelector:aSelector]) {
-        return _mainProxy;
-    } else if ([_secondProxy respondsToSelector:aSelector]) {
-        return _secondProxy;
-    }
-    return [super forwardingTargetForSelector:aSelector];
+    return _realDataSource;
 }
 
 - (nonnull UITableViewCell *)tableView:(nonnull UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
-    id<UITableViewDataSource> proxy = _mainProxy ?: _secondProxy;
-    if (proxy) {
-        return [proxy tableView:tableView cellForRowAtIndexPath:indexPath];
-    }
-    return [[UITableViewCell alloc] init];
+    return [_listView tableView:tableView cellForRowAtIndexPath:indexPath];
 }
 
 - (NSInteger)tableView:(nonnull UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    id<UITableViewDataSource> proxy = _mainProxy ?: _secondProxy;
-    if (proxy) {
-        return [proxy tableView:tableView numberOfRowsInSection:section];
-    }
-    return 0;
+    return [_listView tableView:tableView numberOfRowsInSection:section];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    id<UITableViewDataSource> proxy = _mainProxy ?: _secondProxy;
-    if (proxy) {
-        return [proxy numberOfSectionsInTableView:tableView];
-    }
-    return 1;
+    return [_listView numberOfSectionsInTableView:tableView];
 }
 
 @end

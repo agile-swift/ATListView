@@ -10,15 +10,13 @@
 
 @interface DelegateProxy : NSObject<UITableViewDelegate>
 
-+ (instancetype)delegateWithMainProxy:(id<UITableViewDelegate>)main secondProxy:(id<UITableViewDelegate>)second forObject:(id)object;
++ (instancetype)delegateWithListView:(id<UITableViewDelegate>)listView realDelegate:(id<UITableViewDelegate>)realDelegate forObject:(id)object;
 
-- (instancetype)initWithMainProxy:(id<UITableViewDelegate>)main secondProxy:(id<UITableViewDelegate>)second;
+- (instancetype)initWithListView:(id<UITableViewDelegate>)listView realDelegate:(id<UITableViewDelegate>)realDelegate;
 
-@property (nonatomic, weak) id<UITableViewDelegate> mainProxy;
+@property (nonatomic, weak, readonly) id<UITableViewDelegate> listView;
 
-@property (nonatomic, weak) id<UITableViewDelegate> secondProxy;
-
-- (void)exchangeProxy;
+@property (nonatomic, weak, readonly) id<UITableViewDelegate> realDelegate;
 
 @end
 
