@@ -40,7 +40,7 @@ open class SectionListView<SectionType,RowType>
     ///   - headerType: 下拉刷新组件类
     ///   - footerType: 上拉加载更多组件类
     ///   - configCell: 配置cell闭包
-    public init(style : UITableViewStyle = .plain,
+    public init(style : UITableView.Style = .plain,
                 delegate : UITableViewDelegate? = nil,
                 headerType : RefreshHeader.Type ,
                 footerType : RefreshFooter.Type ,

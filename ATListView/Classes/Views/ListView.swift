@@ -28,7 +28,7 @@ open class ListView<RowType> : SectionListView<EmptySection,RowType> {
     /// 配置cell的闭包定义
     public typealias ListViewCellClosure = (ListView<RowType>, RowType, Int) -> UITableViewCell
     
-    public init(style: UITableViewStyle, delegate: UITableViewDelegate?, headerType: RefreshHeader.Type, footerType: RefreshFooter.Type, _ configCell: @escaping ListViewCellClosure) {
+    public init(style: UITableView.Style, delegate: UITableViewDelegate?, headerType: RefreshHeader.Type, footerType: RefreshFooter.Type, _ configCell: @escaping ListViewCellClosure) {
         super.init(style: style, delegate: delegate, headerType: headerType, footerType: footerType) { (listView, model, indexPath) -> UITableViewCell in
             configCell(listView as! ListView<RowType>,model,indexPath.row)
         }

@@ -35,7 +35,7 @@ public extension SectionListView {
             autoHeightCache![ck!] = h
         }
         if h <= 0.1 {
-            return UITableViewAutomaticDimension
+            return UITableView.automaticDimension
         }
         return h
     }
